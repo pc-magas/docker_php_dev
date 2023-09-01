@@ -24,16 +24,21 @@ RUN curl -sSLf \
     php /tmp/composer-setup.php --install-dir=/bin --filename=composer &&\
     rm -rf /tmp/cpmposer-setup.php &&\
     chmod +x /bin/composer &&\
+    DEBIAN_FRONTEND=noninteractive apt-get update &&\
+    DEBIAN_FRONTEND=noninteractive apt-get install net-tools &&\
     install-php-extensions xdebug &&\
+    mkdir -p /var/log/xdebug.log &&\
     echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
-    echo "xdebug.log = xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.log = /var/log/xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
     cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
     chown root:root /usr/local/bin/entrypoint.sh &&\
     chmod +x /usr/local/bin/entrypoint.sh &&\
     usermod --shell /bin/bash www-data &&\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+
+VOLUME /var/log/xdebug.log
 
 # INSTALL PHP MODULES HERE
 RUN install-php-extensions\
