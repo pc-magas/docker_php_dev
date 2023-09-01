@@ -1,0 +1,63 @@
+version: 3
+
+services:
+
+  nginx:
+    image: nginx
+    network:
+      private:
+      public:
+        ipv4_address: 172.168.0.2
+    volumes:
+      - "php_app:/var/www/html"
+      - "./conf/nginx/nginx.conf::/etc/nginx/nginx.conf:ro"
+
+  php_app:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile
+    volumes:
+      - "php_app:/var/www/html"
+    network:
+      - private
+    environment:
+      - APP_UID=1000
+      - APP_GID=1000
+      - XDEBUG_IDE_KEY=PHPSTORM
+
+  mariadb:
+    # Replace with your own
+    image: mariadb:10.4
+    command:
+      --max_allowed_packet=64M
+      --optimizer_use_condition_selectivity=1
+      --optimizer_switch="rowid_filter=off"
+    network:
+      private:
+      public:
+        ipv4_address: 172.168.0.3
+    env_file: env/db.env
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+
+  dbdata:
+
+  php_app:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PHP_APP}
+  
+network:
+
+  private:
+
+  public:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.168.0.0/24
+          gateway: 172.168.0.1 

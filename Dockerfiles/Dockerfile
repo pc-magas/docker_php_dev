@@ -13,12 +13,27 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     XDEBUG_DBGP=FALSE \
     COMPOSER_MEMORY_LIMIT=-1
 
-# We want for development easyness
+COPY ./entrypoint/entrypoint.sh  /usr/local/bin/entrypoint.sh
+
+# Install Base tools
 RUN curl -sSLf \
         -o /usr/local/bin/install-php-extensions \
         https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && \
-    chmod +x /usr/local/bin/install-php-extensions
-
+    chmod +x /usr/local/bin/install-php-extensions &&\
+    php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" &&\
+    php /tmp/composer-setup.php --install-dir=/bin --filename=composer &&\
+    rm -rf /tmp/cpmposer-setup.php &&\
+    chmod +x /bin/composer &&\
+    install-php-extensions xdebug &&\
+    echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.log = xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
+    cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
+    chown root:root /usr/local/bin/entrypoint.sh &&\
+    chmod +x /usr/local/bin/entrypoint.sh &&\
+    usermod --shell /bin/bash www-data &&\
+    apt-get autoremove && apt-get autoclean &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
 # INSTALL PHP MODULES HERE
 RUN install-php-extensions\
@@ -45,4 +60,13 @@ RUN install-php-extensions\
      spl\
      tokenizer\
      xmlwriter\
-     xsl
+     xsl &&\
+    apt-get autoremove && apt-get autoclean &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+
+# Place rest settings here
+
+
+# Do not edit bellow this line
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]
