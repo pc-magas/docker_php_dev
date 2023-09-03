@@ -6,14 +6,14 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     FPM_CONF_DIR="/usr/local/etc/php-fpm.d"\
     DOCKER_UID=1000 \
     DOCKER_GID=1000 \
-    XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini \
     XDEBUG_HOST="" \
     XDEBUG_IDE_KEY="" \
-    XDEBUG_PORT=9000 \
+    XDEBUG_PORT=9003 \
     XDEBUG_DBGP=FALSE \
+    XDEBUG_ENABLE=FALSE \
     COMPOSER_MEMORY_LIMIT=-1
 
-COPY ./entrypoint/entrypoint.sh  /usr/local/bin/entrypoint.sh
+env XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
 
 # Install Base tools
 RUN curl -sSLf \
@@ -22,23 +22,22 @@ RUN curl -sSLf \
     chmod +x /usr/local/bin/install-php-extensions &&\
     php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" &&\
     php /tmp/composer-setup.php --install-dir=/bin --filename=composer &&\
-    rm -rf /tmp/cpmposer-setup.php &&\
+    rm -rf /tmp/composer-setup.php &&\
     chmod +x /bin/composer &&\
-    DEBIAN_FRONTEND=noninteractive apt-get update &&\
-    DEBIAN_FRONTEND=noninteractive apt-get install net-tools &&\
     install-php-extensions xdebug &&\
-    mkdir -p /var/log/xdebug.log &&\
+    mkdir -p /var/log/xdebug &&\
+    DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install net-tools &&\
+    echo "zend_extension=xdebug" >> ${XDEBUG_CONF_FILE} &&\
+    echo "[xdebug]" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
-    echo "xdebug.log = /var/log/xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.log = /var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.discover_client_host=true" >> ${XDEBUG_CONF_FILE} &&\
     cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
-    chown root:root /usr/local/bin/entrypoint.sh &&\
-    chmod +x /usr/local/bin/entrypoint.sh &&\
-    usermod --shell /bin/bash www-data &&\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
-VOLUME /var/log/xdebug.log
+VOLUME /var/log/xdebug
 
 # INSTALL PHP MODULES HERE
 RUN install-php-extensions\
@@ -73,5 +72,15 @@ RUN install-php-extensions\
 
 
 # Do not edit bellow this line
+
+COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
+COPY ./utils/test_xdebug.php /bin/test_xdebug
+
+RUN chmod +x /bin/test_xdebug &&\
+    chown root:root /bin/test_xdebug &&\
+    chown root:root /usr/local/bin/entrypoint.sh &&\
+    chmod +x /usr/local/bin/entrypoint.sh &&\
+    usermod --shell /bin/bash www-data
+
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
