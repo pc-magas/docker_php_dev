@@ -76,8 +76,7 @@ Where **X.X.X.X** is defined upon `IP_BASE` environmental variable.
 The xdebug settings are set via the following variables at file `env/php.env`:
 
 Variable | Description | Available values
---- | --- |
-
+--- | --- | ---
 XDEBUG_IDE_KEY | IDE key where used to define the IDE
 XDEBUG_PORT | Port where xdebug will be connected in to
 XDEBUG_ENABLE | Whether xdebug will be enabled or not | `TRUE` or `FALSE`
