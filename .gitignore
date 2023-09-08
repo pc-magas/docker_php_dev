@@ -3,3 +3,4 @@
 logs/*
 !logs/.gitkeep
 test/php/test_xdebug.php
+.env

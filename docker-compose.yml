@@ -9,8 +9,6 @@ services:
     volumes:
       - "php_app:/var/www/html"
       - "./logs/xdebug:/var/log/xdebug"
-      # Remove this line used for development only of xdebug tester 
-      - "./utils/test_xdebug.php:/var/www/html/test_xdebug.php"
     networks:
       private:
     environment:
@@ -20,8 +18,7 @@ services:
       - XDEBUG_PORT=9003
       - XDEBUG_ENABLE=TRUE
       - XDEBUG_DBGP=TRUE
-    extra_hosts:
-      host.docker.internal: host-gateway
+
 
   # Supportive services
   
@@ -30,7 +27,7 @@ services:
     networks:
       private:
       public:
-        ipv4_address: 172.168.0.2
+        ipv4_address: ${IP_BASE}.2
     volumes:
       - "php_app:/var/www/html"
       - "./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
@@ -45,7 +42,7 @@ services:
     networks:
       private:
       public:
-        ipv4_address: 172.168.0.3
+        ipv4_address: ${IP_BASE}.3
     env_file: env/db.env
     volumes:
       - dbdata:/var/lib/mysql
@@ -66,5 +63,5 @@ networks:
   public:
     ipam:
       config:
-        - subnet: 172.168.0.0/24
-          gateway: 172.168.0.1 
+        - subnet: ${IP_BASE}.0/24
+          gateway: ${IP_BASE}.1 
