@@ -27,12 +27,14 @@ RUN curl -sSLf \
     install-php-extensions xdebug &&\
     mkdir -p /var/log/xdebug &&\
     DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install net-tools &&\
-    echo "zend_extension=xdebug" >> ${XDEBUG_CONF_FILE} &&\
     echo "[xdebug]" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.log = /var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
     echo "xdebug.discover_client_host=true" >> ${XDEBUG_CONF_FILE} &&\
+    touch /var/log/xdebug/xdebug.log &&\
+    chown -R www-data:www-data /var/log/xdebug &&\
+    chmod +w /var/log/xdebug &&\
     cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*

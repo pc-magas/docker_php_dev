@@ -9,6 +9,8 @@ services:
     volumes:
       - "php_app:/var/www/html"
       - "./logs/xdebug:/var/log/xdebug"
+      # Remove this line used for development only of xdebug tester 
+      - "./utils/test_xdebug.php:/var/www/html/test_xdebug.php"
     networks:
       private:
     environment:
