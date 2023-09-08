@@ -3,6 +3,7 @@ services:
 
   # PHP APPS
   php_app:
+    container_name: php_app
     build:
       context: .
       dockerfile: ./dockerfiles/Dockerfile
@@ -11,14 +12,7 @@ services:
       - "./logs/xdebug:/var/log/xdebug"
     networks:
       private:
-    environment:
-      - APP_UID=1000
-      - APP_GID=1000
-      - XDEBUG_IDE_KEY=PHPSTORM
-      - XDEBUG_PORT=9003
-      - XDEBUG_ENABLE=TRUE
-      - XDEBUG_DBGP=TRUE
-
+    environment: env/php.env
 
   # Supportive services
   
@@ -45,11 +39,9 @@ services:
         ipv4_address: ${IP_BASE}.3
     env_file: env/db.env
     volumes:
-      - dbdata:/var/lib/mysql
+      - ./volumes/db:/var/lib/mysql
 
 volumes:
-
-  dbdata:
 
   php_app:
     driver: local
