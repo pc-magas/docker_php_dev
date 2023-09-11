@@ -82,7 +82,7 @@ XDEBUG_PORT | Port where xdebug will be connected in to
 XDEBUG_ENABLE | Whether xdebug will be enabled or not | `TRUE` or `FALSE`
 XDEBUG_DBGP | Whether DBGP protocol will be used | `TRUE` or `FALSE`
 XDEBUG_ENABLE | Whether Xdebug is enabled or not | `TRUE` or `FALSE`
-XDEBUG_HOST | Host where Edebug listens to. If no value provided then it is auto-detected |
+XDEBUG_HOST | Host where Xdebug listens to. If no value provided then it is auto-detected |
 
 
 
