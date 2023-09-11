@@ -85,7 +85,7 @@ XDEBUG_ENABLE | Whether Xdebug is enabled or not | `TRUE` or `FALSE`
 
 
 
-The IP where IDE listen to is automatically detected. In order tot est the connectivity upon php container use the following command once you got shell access into the php running container:
+The IP where IDE listen to is automatically detected. In order to test the connectivity upon php container use the following command once you got shell access into the php running container:
 
 ```
 test_xdebug
