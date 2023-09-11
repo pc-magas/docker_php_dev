@@ -2,6 +2,7 @@
 A Basic php boilerplate code that allows you to rapidly setup and develop php applications.
 
 > NOTE:
+> 
 > THE boilerplate is desighned and tested to run upon *docker engine* directly in *GNU/linux* hosts and not using docker desktop.
 
 # How to use
