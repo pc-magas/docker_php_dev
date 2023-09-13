@@ -99,4 +99,19 @@ In order to get access upon the php running container run:
 docker exec -ti -u www-data php_app /bin/bash
 ```
 
-> NOTE: In case that an already existing container has the name `php_app` change the value `container_name` at `php_app` service.
+> NOTE: 
+>
+> In case that an already existing container has the name `php_app` change the value `container_name` at `php_app` service.
+
+# PHP And composer version
+
+At docker-compose.yml at the service `php_app` you can define composer and php version app via the following args:
+
+* `PHP_VERSION` for the php version
+* `COMPOSER_VERSION` for the composer version. This is the tags defined at composer docker [image](https://hub.docker.com/_/composer/tags) 
+
+If each argument is changed run the containers as:
+
+```
+docker-compose up -d --build
+```
