@@ -1,5 +1,8 @@
-FROM php:8.1-fpm
 
+ARG COMPOSER_VERSION=latest\
+    PHP_VERSION=8.1
+FROM composer:${COMPOSER_VERSION} as composer
+FROM php:${PHP_VERSION}-fpm
 
 ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     PHP_SETTINGS="$PHP_INI_DIR/php.ini"\
@@ -13,36 +16,12 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     XDEBUG_ENABLE=FALSE \
     COMPOSER_MEMORY_LIMIT=-1
 
-env XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
-
-# Install Base tools
+# INSTALL PHP MODULES HERE
 RUN curl -sSLf \
         -o /usr/local/bin/install-php-extensions \
-        https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions && \
+        https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions &&\
     chmod +x /usr/local/bin/install-php-extensions &&\
-    php -r "copy('https://getcomposer.org/installer', '/tmp/composer-setup.php');" &&\
-    php /tmp/composer-setup.php --install-dir=/bin --filename=composer &&\
-    rm -rf /tmp/composer-setup.php &&\
-    chmod +x /bin/composer &&\
-    install-php-extensions xdebug &&\
-    mkdir -p /var/log/xdebug &&\
-    DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install net-tools &&\
-    echo "[xdebug]" >> ${XDEBUG_CONF_FILE} &&\
-    echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE} &&\
-    echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
-    echo "xdebug.log = /var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
-    echo "xdebug.discover_client_host=true" >> ${XDEBUG_CONF_FILE} &&\
-    touch /var/log/xdebug/xdebug.log &&\
-    chown -R www-data:www-data /var/log/xdebug &&\
-    chmod +w /var/log/xdebug &&\
-    cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
-    apt-get autoremove && apt-get autoclean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
-
-VOLUME /var/log/xdebug
-
-# INSTALL PHP MODULES HERE
-RUN install-php-extensions\
+    install-php-extensions\
      bcmath\
      ctype\
      curl\
@@ -70,16 +49,45 @@ RUN install-php-extensions\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
-# Place rest settings here
 
+# Install composer
+COPY --from=composer /usr/bin/composer /opt/composer
+RUN install-php-extensions zip &&\
+    chown root:root /opt/composer &&\
+    echo "#!/usr/bin/env sh\nphp -dxdebug.mode=off /opt/composer" > /bin/composer &&\
+    chmod +x /bin/composer
+
+# Install Xdebug
+env XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
+
+COPY ./utils/test_xdebug.php /bin/test_xdebug
+COPY ./utils/get_xdebug_ip.php /bin/get_xdebug_ip
+
+RUN echo "Layer v 1" &&\
+    chmod +x /bin/test_xdebug &&\
+    chmod +x /bin/get_xdebug_ip &&\
+    install-php-extensions xdebug &&\
+    mkdir -p /var/log/xdebug &&\
+    echo "[xdebug]" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.log = /var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.discover_client_host=false" >> ${XDEBUG_CONF_FILE} &&\
+    echo "xdebug.start_with_request = trigger" >> ${XDEBUG_CONF_FILE} &&\
+    touch /var/log/xdebug/xdebug.log &&\
+    chown -R www-data:www-data /var/log/xdebug &&\
+    chmod -R 666 /var/log/xdebug &&\
+    cp ${XDEBUG_CONF_FILE} ${XDEBUG_CONF_FILE}.orig &&\
+    apt-get autoremove && apt-get autoclean &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+
+VOLUME /var/log/xdebug
 
 # Do not edit bellow this line
 
 COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
-COPY ./utils/test_xdebug.php /bin/test_xdebug
 
-RUN chmod +x /bin/test_xdebug &&\
-    chown root:root /bin/test_xdebug &&\
+RUN echo "Layer v2" &&\
     chown root:root /usr/local/bin/entrypoint.sh &&\
     chmod +x /usr/local/bin/entrypoint.sh &&\
     usermod --shell /bin/bash www-data

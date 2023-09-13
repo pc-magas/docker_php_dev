@@ -10,9 +10,10 @@ services:
     volumes:
       - "php_app:/var/www/html"
       - "./logs/xdebug:/var/log/xdebug"
+      - "./utils/get_xdebug_ip.php:/var/www/html/get_xdebug_ip.php"
     networks:
       private:
-    environment: env/php.env
+    env_file: env/php.env
 
   # Supportive services
   

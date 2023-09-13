@@ -11,7 +11,7 @@ cp ${XDEBUG_CONF_FILE}.orig ${XDEBUG_CONF_FILE}
 echo "XDEBUG FILE IS ${XDEBUG_CONF_FILE}"
 
 if [ -z ${XDEBUG_HOST} ]; then
-  ip=$(netstat -rn | grep "^0.0.0.0 " | cut -d " " -f10)
+  ip=$(get_xdebug_ip | tr -d '\n')
   XDEBUG_HOST=${ip}
 fi
 
@@ -26,8 +26,8 @@ if [ ! -z "${XDEBUG_IDE_KEY}" ]; then
   echo "xdebug.idekey=\"${XDEBUG_IDE_KEY}\"" >>${XDEBUG_CONF_FILE}
 fi
 
-if [ ${XDEBUG_ENABLE} = TRUE ]; then
-  echo "xdebug.start_with_request=yes" >>${XDEBUG_CONF_FILE}
+if [ ${XDEBUG_ENABLE} = FALSE ]; then
+  sed -i "s/xdebug.mode = .*/xdebug.mode = off/" ${XDEBUG_CONF_FILE}
 fi
 
 cat ${XDEBUG_CONF_FILE}
