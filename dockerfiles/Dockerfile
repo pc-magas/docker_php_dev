@@ -1,6 +1,9 @@
 
 ARG COMPOSER_VERSION=latest\
-    PHP_VERSION=8.1
+    PHP_VERSION=8.1 \
+    NODE_VERSION=latest
+
+FROM node:${NODE_VERSION} as node
 FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}-fpm
 
@@ -83,7 +86,21 @@ RUN echo "Layer v 1" &&\
 
 VOLUME /var/log/xdebug
 
+# ***************************************************#
+# Uncomment for nodejs (for example frontend builds) #
+# ***************************************************#
+
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm &&\
+    ln -s /usr/local/lib/node_modules/webpack-cli/bin/cli.js /usr/local/bin/webpack &&\
+    chown -R root:root /usr/local/lib/node_modules &&\
+    mkdir -p /var/www/.npm
+
+#***********************************************#
 # Do not edit bellow this line
+#***********************************************#
 
 COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
 
