@@ -115,3 +115,19 @@ If each argument is changed run the containers as:
 ```
 docker-compose up -d --build
 ```
+
+# SSL Certificates
+
+There is a script named `./bin/certgen.sh` that is used to generate the nessesary certificates. is creates the following certificates:
+
+* CA root ones at ./ssl/ca folder:
+  * ca.crt << Certificate
+  * ca.key << Certificate key
+
+* Ones used by nginx at ./ssl/certs folder:
+  * www.crt << Certificate
+  * www.key << Certificate key
+
+Import the CA ones to your browser.
+
+The configuration for the domains that certs are used are in the file `ssl/conf/v3.sign` read comments in it in order how to configure it.
