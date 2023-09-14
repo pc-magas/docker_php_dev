@@ -22,7 +22,8 @@ SCRIPTPATH="$(dirname "$SCRIPT")"
 SSL_PATH="${SCRIPTPATH}/../ssl"
 
 CERT_PATH="${SSL_PATH}/certs"
-SSL_CONF_PATH="${SSL_PATH}/conf"
+SSL_CONF_PATH="${SSL_PATH}/conf/ssl_conf"
+SIGNING_REQUEST_CONF="${SSL_PATH}/conf/v3.sign"
 
 CA_PATH="${SSL_PATH}/ca"
 CA_KEY=${CA_PATH}/ca.key 
@@ -43,13 +44,16 @@ CERTIFICATE_PATH=${CERT_PATH}/${CERT_BASENAME}.crt
 KEY_PATH=${CERT_PATH}/${CERT_BASENAME}.key
 SIGNING_REQUEST=${CERT_PATH}/${CERT_BASENAME}.csr
 
-
 echo "CREATING CERTIFICATE"
 
-openssl req -new -sha512 -keyout ${KEY_PATH} -nodes -out ${SIGNING_REQUEST} -config ${SSL_CONF_PATH}/ssl_conf
+openssl req -new -sha512 -keyout ${KEY_PATH} -nodes -out ${SIGNING_REQUEST} -config ${SSL_CONF_PATH}
+
+
 echo "SIGNING CERTIFICATE using CA"
-ls -l ${SIGNING_REQUEST}
-openssl x509 -req -days 9000 -startdate  -sha512 -in ${SIGNING_REQUEST} -CAkey ${CA_KEY} -CA ${CA_CERT} -CAcreateserial -extfile ${SSL_CONF_PATH}/v3.sign -out ${CERTIFICATE_PATH} 
+openssl x509 -req -days 9000 -startdate -sha512 -in ${SIGNING_REQUEST} \
+     -CAkey ${CA_KEY} -CA ${CA_CERT} -CAcreateserial \
+     -extfile ${SIGNING_REQUEST_CONF} \
+     -out ${CERTIFICATE_PATH} 
 
 rm -rf ${SIGNING_REQUEST}
 
