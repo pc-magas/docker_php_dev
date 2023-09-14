@@ -8,6 +8,7 @@ subjectAltName = @alt_names
 [alt_names]
 # Local hosts
 # COnfigure Any ips that need ssl here
+# Note: Any ip indicating record MUST start with IP.^num^=
 IP.1 = localhost
 IP.2 = 127.0.0.1
 IP.3 = ::1 
