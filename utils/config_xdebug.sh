@@ -23,21 +23,25 @@ xdebug.log = /var/log/xdebug/xdebug.log
 xdebug.start_with_request=yes
 EOL
 
-XDEBUG_VERSION = $(php -r "echo substr(phpversion('xdebug'),0,1);")
 
-if [ "${XDEBUG_ENABLE}" == TRUE ]; then
-  docker-php-ext-enable xdebug
+if [ "${XDEBUG_ENABLE}" == FALSE ]; then
+  exit
 fi
+
+XDEBUG_VERSION=$(php -r "echo substr(phpversion('xdebug'),0,1);")
 
 if [ -z ${XDEBUG_HOST} ]; then
   ip=$(netstat -rn | grep "^0.0.0.0 " | cut -d " " -f10)
   XDEBUG_HOST=${ip}
 fi
 
-if [ "${XDEBUG_VERSION}" == "3"]; then
+
+if [ "${XDEBUG_VERSION}" == "3" ]; then
+  echo ${XDEBUG_CONF_3} >> ${XDEBUG_CONF_FILE} 
   echo "xdebug.client_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.client_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
 else 
+  echo ${XDEBUG_CONF_2} >> ${XDEBUG_CONF_FILE} 
   echo "xdebug.remote_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
 fi

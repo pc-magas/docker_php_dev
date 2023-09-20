@@ -6,7 +6,7 @@ usermod -u ${DOCKER_UID} ${WEB_USER}
 groupmod -g ${DOCKER_GID} ${WEB_USER}
 
 
-bash /bin/setup_xdebug
+bash /bin/config_xdebug
 
 echo "Fixing execution permissions"
 find /var/www/html -iname "*.php" | xargs chmod 777

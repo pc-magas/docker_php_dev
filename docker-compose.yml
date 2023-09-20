@@ -8,8 +8,9 @@ services:
       context: .
       dockerfile: ./dockerfiles/Dockerfile
       args:
-        - PHP_VERSION=8.1
+        - PHP_VERSION=7.4
         - COMPOSER_VERSION=latest
+        - XDEBUG_VERSION=2.4
     volumes:
       - "php_app:/var/www/html"
       - "./logs/xdebug:/var/log/xdebug"
