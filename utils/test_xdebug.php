@@ -34,15 +34,26 @@ echo "SETTINGS FILE: ".HIGILIGHT.$xdebug_settings.NC.PHP_EOL;
 $php_settings_dir = getenv("PHP_CONF_DIR");
 
 if(dirname($xdebug_settings)!=trim($php_settings_dir)){
-    echo "######".PHP_EOL.ERROR."Xdebug config file not in ".INFO.$php_settings_dir.NC.PHP_EOL;
+    echo "######".PHP_EOL.ERROR."Xdebug config file not in ".HIGILIGHT.$php_settings_dir.NC.PHP_EOL;
     exit(1);
 }
 
 echo PHP_EOL."##### CONTENTS #####".PHP_EOL.HIGILIGHT.file_get_contents($xdebug_settings).NC.PHP_EOL;
 $settings = parse_ini_file($xdebug_settings);
 
+$xdebug_version = phpversion("xdebug");
+
+echo "Installed XDEBUG Version: ".HIGILIGHT.$xdebug_version.NC.PHP_EOL;
+
+
 $host=$settings['xdebug.client_host'];
 $port=$settings['xdebug.client_port'];
+
+if(version_compare($xdebug_version,"3.0")<0){
+    $host=$settings['xdebug.remote_host'];
+    $port=$settings['xdebug.remote_port'];
+}
+
 $timeout = 30;
 
 echo PHP_EOL."##############".PHP_EOL."TESTING ".HIGILIGHT."${host}:${port}".NC.PHP_EOL;

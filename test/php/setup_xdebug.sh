@@ -2,6 +2,12 @@
 
 XDEBUG_VERSION="$(echo "${XDEBUG_VERSION}" | tr -d '[:space:]')"
 
+echo "${XDEBUG_VERSION}"
+
+if [ "${XDEBUG_VERSION}" != "" ]; then
+    echo "HELLO"
+fi
+
 if [ -z ${XDEBUG_VERSION} ] && [ "${XDEBUG_VERSION}" != "" ] && [ "${XDEBUG_VERSION}" != "latest" ] ; then
     echo "Installing xdebug version ${XDEBUG_VERSION}"
     install-php-extensions xdebug-${XDEBUG_VERSION}

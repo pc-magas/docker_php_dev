@@ -18,31 +18,32 @@ if [ -z ${XDEBUG_HOST} ]; then
   XDEBUG_HOST=${ip}
 fi
 
+docker-php-ext-enable xdebug
+cat ${XDEBUG_CONF_FILE}
 
 if [ "${XDEBUG_VERSION}" = "3" ]; then
-    echo "SETUP XDEBUG 3"
-    
-    cat <<EOL >${XDEBUG_CONF_FILE}
-zend_extension = xdebug.so
-[xdebug]
-xdebug.mode = debug,develop
-xdebug.max_nesting_level = 1000
-xdebug.log = /var/log/xdebug/xdebug.log
-xdebug.start_with_request=yes
-EOL
+  echo "SETUP XDEBUG 3"
+
+  echo "[xdebug]" >> ${XDEBUG_CONF_FILE} 
+  echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE}
+  echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} 
+  echo "xdebug.log = /var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE} 
+  echo "xdebug.discover_client_host=false" >> ${XDEBUG_CONF_FILE}
+  echo "xdebug.start_with_request = trigger" >> ${XDEBUG_CONF_FILE}
+
   echo "xdebug.client_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.client_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
+
 else 
   echo "SETUP XDEBUG 2"
 
-  cat<<EOL >${XDEBUG_CONF_FILE}
-zend_extension = xdebug.so
-xdebug.remote_enable = 1
-xdebug.max_nesting_level = 1000
-xdebug.remote_mode=req
-xdebug.remote_autostart=true
-xdebug.remote_log=/var/log/xdebug/xdebug.log
-EOL
+  
+  echo "xdebug.remote_enable = 1" >>  ${XDEBUG_CONF_FILE}
+  echo "xdebug.max_nesting_level = 1000" >>  ${XDEBUG_CONF_FILE}
+  echo "xdebug.remote_mode=req" >>  ${XDEBUG_CONF_FILE}
+  echo "xdebug.remote_autostart=true" >> ${XDEBUG_CONF_FILE}
+  echo "xdebug.remote_log=/var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE}
+
   echo "xdebug.remote_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
 fi

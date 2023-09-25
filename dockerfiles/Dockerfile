@@ -3,7 +3,7 @@ ARG COMPOSER_VERSION=latest\
     PHP_VERSION=8.1 \
     NODE_VERSION=latest
 
-FROM node:${NODE_VERSION} as node
+# FROM node:${NODE_VERSION} as node
 FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}-fpm
 
@@ -19,14 +19,14 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     XDEBUG_ENABLE=FALSE \
     COMPOSER_MEMORY_LIMIT=-1
 
-RUN usermod --shell /bin/bash www-data
-
-# INSTALL PHP MODULES HERE
-RUN curl -sSLf \
+RUN usermod --shell /bin/bash www-data &&\
+    curl -sSLf \
         -o /usr/local/bin/install-php-extensions \
         https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions &&\
-    chmod +x /usr/local/bin/install-php-extensions &&\
-    install-php-extensions\
+    chmod +x /usr/local/bin/install-php-extensions
+
+# INSTALL PHP MODULES HERE
+RUN install-php-extensions\
      bcmath\
      ctype\
      curl\
@@ -106,8 +106,6 @@ RUN echo "Layer v2" &&\
     chown root:root /usr/local/bin/entrypoint.sh &&\
     chmod +x /usr/local/bin/entrypoint.sh &&\
     usermod --shell /bin/bash www-data
-
-RUN apt-get update && apt-get install git && apt-get autoremove && apt-get autoclean
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
