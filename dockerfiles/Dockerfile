@@ -1,8 +1,7 @@
 
 ARG COMPOSER_VERSION=latest\
     PHP_VERSION=8.1 \
-    NODE_VERSION=latest\
-    XDEBUG_VERSION
+    NODE_VERSION=latest
 
 FROM node:${NODE_VERSION} as node
 FROM composer:${COMPOSER_VERSION} as composer
@@ -67,18 +66,18 @@ RUN install-php-extensions zip &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
 # Install Xdebug
-env XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
+ENV XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
+
+ARG XDEBUG_VERSION="latest"
 
 COPY ./utils/test_xdebug.php /bin/test_xdebug
 COPY ./utils/get_xdebug_ip.php /bin/get_xdebug_ip
 COPY ./utils/setup_xdebug.sh /bin/setup_xdebug
-COPY ./utils/config_xdebug.sh /bin/config_xdebug
 
-RUN bash /bin/setup_xdebug &&\
+RUN echo ${XDEBUG_VERSION} &&\
+    bash /bin/setup_xdebug &&\
     chown root:root /bin/test_xdebug &&\
     chmod +x /bin/test_xdebug &&\
-    chown root:root /bin/config_xdebug &&\
-    chmod +x /bin/config_xdebug &&\
     rm -rf /bin/setup_xdebug &&\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
