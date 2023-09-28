@@ -26,44 +26,44 @@ RUN usermod --shell /bin/bash www-data &&\
     chmod +x /usr/local/bin/install-php-extensions
 
 # INSTALL PHP MODULES HERE
-RUN install-php-extensions\
-     bcmath\
-     ctype\
-     curl\
-     dom\ 
-     fileinfo\ 
-     filter\ 
-     gd\ 
-     hash\ 
-     iconv\ 
-     intl\ 
-     json\ 
-     libxml\ 
-     openssl\ 
-     mbstring\ 
-     pcre\
-     pdo pdo_mysql\
-     simplexml\
-     soap \
-     sockets\
-     sodium\
-     spl\
-     tokenizer\
-     xmlwriter\
-     xsl &&\
-    apt-get autoremove && apt-get autoclean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+# RUN install-php-extensions\
+#      bcmath\
+#      ctype\
+#      curl\
+#      dom\ 
+#      fileinfo\ 
+#      filter\ 
+#      gd\ 
+#      hash\ 
+#      iconv\ 
+#      intl\ 
+#      json\ 
+#      libxml\ 
+#      openssl\ 
+#      mbstring\ 
+#      pcre\
+#      pdo pdo_mysql\
+#      simplexml\
+#      soap \
+#      sockets\
+#      sodium\
+#      spl\
+#      tokenizer\
+#      xmlwriter\
+#      xsl &&\
+#     apt-get autoremove && apt-get autoclean &&\
+#     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
 
 # Install composer & git
-COPY --from=composer /usr/bin/composer /opt/composer
-RUN install-php-extensions zip &&\
-    chown root:root /opt/composer &&\
-    echo "#!/usr/bin/env sh\nphp -dxdebug.mode=off /opt/composer" > /bin/composer &&\
-    chmod +x /bin/composer &&\
-    DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git &&\
-    apt-get autoremove && apt-get autoclean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+# COPY --from=composer /usr/bin/composer /opt/composer
+# RUN install-php-extensions zip &&\
+#     chown root:root /opt/composer &&\
+#     echo "#!/usr/bin/env sh\nphp -dxdebug.mode=off /opt/composer" > /bin/composer &&\
+#     chmod +x /bin/composer &&\
+#     DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git &&\
+#     apt-get autoremove && apt-get autoclean &&\
+#     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
 # Install Xdebug
 ENV XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
