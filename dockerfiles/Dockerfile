@@ -3,6 +3,7 @@ ARG COMPOSER_VERSION=latest\
     PHP_VERSION=8.1 \
     NODE_VERSION=latest
 
+# Uncomment line bellow for Nodejs support.
 # FROM node:${NODE_VERSION} as node
 FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}-fpm
@@ -62,8 +63,13 @@ RUN install-php-extensions zip &&\
     echo "#!/usr/bin/env sh\nphp -dxdebug.mode=off /opt/composer" > /bin/composer &&\
     chmod +x /bin/composer &&\
     DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git &&\
+    mkdir -p /var/www/.composer &&\
+    chown www-data:www-data /var/www/.composer &&\
+    chmod 666 /var/www/.composer &&\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+
+VOLUME /var/www/.composer
 
 # Install Xdebug
 ENV XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
@@ -72,10 +78,12 @@ ARG XDEBUG_VERSION="latest"
 
 COPY ./utils/test_xdebug.php /bin/test_xdebug
 COPY ./utils/get_xdebug_ip.php /bin/get_xdebug_ip
-COPY ./utils/setup_xdebug.sh /bin/setup_xdebug
+COPY ./utils/setup_xdebug.php /tmp/setup_xdebug
 
 RUN echo ${XDEBUG_VERSION} &&\
-    bash /bin/setup_xdebug &&\
+    php /tmp/setup_xdebug &&\
+    rm -rf /tmp/setup_xdebug &&\
+    rm -rf /tmp/xdebug &&\
     chown root:root /bin/test_xdebug &&\
     chmod +x /bin/test_xdebug &&\
     rm -rf /bin/setup_xdebug &&\
@@ -102,8 +110,7 @@ VOLUME /var/log/xdebug
 
 COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
 
-RUN echo "Layer v2" &&\
-    chown root:root /usr/local/bin/entrypoint.sh &&\
+RUN chown root:root /usr/local/bin/entrypoint.sh &&\
     chmod +x /usr/local/bin/entrypoint.sh &&\
     usermod --shell /bin/bash www-data
 
