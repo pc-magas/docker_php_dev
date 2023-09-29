@@ -5,18 +5,12 @@ WEB_USER="www-data"
 usermod -u ${DOCKER_UID} ${WEB_USER}
 groupmod -g ${DOCKER_GID} ${WEB_USER}
 
-
 if [ -z ${XDEBUG_HOST} ]; then
   ip=$(get_xdebug_ip | tr -d '\n')
   XDEBUG_HOST=${ip}
 fi
 
 XDEBUG_VERSION=$(php -r "echo substr(phpversion('xdebug'),0,1);")
-
-if [ -z ${XDEBUG_HOST} ]; then
-  ip=$(netstat -rn | grep "^0.0.0.0 " | cut -d " " -f10)
-  XDEBUG_HOST=${ip}
-fi
 
 docker-php-ext-enable xdebug
 cat ${XDEBUG_CONF_FILE}
