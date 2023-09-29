@@ -3,6 +3,7 @@ ARG COMPOSER_VERSION=latest\
     PHP_VERSION=8.1 \
     NODE_VERSION=latest
 
+# Uncomment line bellow for Nodejs support.
 # FROM node:${NODE_VERSION} as node
 FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}-fpm
