@@ -67,6 +67,8 @@ if [ -d "/var/www/.composer" ]; then
  chmod 777 /var/www/.composer
 fi
 
+chmod 644 /usr/local/share/ca-certificates/*
+
 
 echo "Launch application"
 exec "$@"
