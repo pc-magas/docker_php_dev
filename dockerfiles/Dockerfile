@@ -114,12 +114,11 @@ RUN chown root:root /usr/local/bin/entrypoint.sh &&\
     chmod +x /usr/local/bin/entrypoint.sh &&\
     usermod --shell /bin/bash www-data
 
-VOLUME /usr/local/share/ca-certificates
-COPY ./ssl/ca/ca.crt /usr/local/share/ca-certificates/php-www-ca.crt
-RUN chmod 644 /usr/local/share/ca-certificates/php-www-ca.crt && \
-    echo php-www-ca.crt >> /etc/ca-certificates.conf && \
-    update-ca-certificates
+# COPY ./ssl/ca/ca.crt /usr/local/share/ca-certificates/php-www-ca.crt
+RUN cp /etc/ca-certificates.conf /etc/ca-certificates.conf.orig &&\
+    mkdir -p /usr/local/share/cert_install
 
+VOLUME /usr/local/share/cert_install
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
