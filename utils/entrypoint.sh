@@ -10,9 +10,11 @@ if [ -z ${XDEBUG_HOST} ]; then
   XDEBUG_HOST=${ip}
 fi
 
-XDEBUG_VERSION=$(php -r "echo substr(phpversion('xdebug'),0,1);")
-
 docker-php-ext-enable xdebug
+
+XDEBUG_VERSION=$(php -r "echo substr(phpversion('xdebug'),0,1);")
+echo "Detected xdebug version ${XDEBUG_VERSION}"
+
 cat ${XDEBUG_CONF_FILE}
 
 if [ "${XDEBUG_VERSION}" = "3" ]; then
