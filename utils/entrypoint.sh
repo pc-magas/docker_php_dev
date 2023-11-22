@@ -37,7 +37,7 @@ else
   echo "xdebug.remote_enable = 1" >>  ${XDEBUG_CONF_FILE}
   echo "xdebug.max_nesting_level = 1000" >>  ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_mode=req" >>  ${XDEBUG_CONF_FILE}
-  echo "xdebug.remote_autostart=true" >> ${XDEBUG_CONF_FILE}
+  echo "xdebug.remote_autostart=0" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_log=/var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE}
 
   echo "xdebug.remote_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
