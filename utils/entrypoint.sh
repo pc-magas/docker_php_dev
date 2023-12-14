@@ -5,6 +5,8 @@ WEB_USER="www-data"
 usermod -u ${DOCKER_UID} ${WEB_USER}
 groupmod -g ${DOCKER_GID} ${WEB_USER}
 
+chown ${WEB_USER}:${WEB_USER} ${WWW_HOME}
+
 if [ -z ${XDEBUG_HOST} ]; then
   ip=$(get_xdebug_ip | tr -d '\n')
   XDEBUG_HOST=${ip}
@@ -63,10 +65,10 @@ if [ -d "/var/www/.npm" ]; then
  chmod 777 /var/www/.npm
 fi
 
-if [ -d "/var/www/.composer" ]; then
+if [ -d "${WWW_HOME}/.composer" ]; then
  echo "fix /var/www/.composer"
- chown -R ${WEB_USER}:${WEB_USER} /var/www/.composer
- chmod 777 /var/www/.composer
+ chown -R ${WEB_USER}:${WEB_USER} ${WWW_HOME}/.composer
+ chmod 777 ${WWW_HOME}/.composer
 fi
 
 echo "Installing certificates"
