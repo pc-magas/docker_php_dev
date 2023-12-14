@@ -86,8 +86,7 @@ ENV XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
 
 ARG XDEBUG_VERSION="latest"
 
-COPY ./utils/test_xdebug.php /bin/test_xdebug
-COPY ./utils/get_xdebug_ip.php /bin/get_xdebug_ip
+COPY ./utils/test_xdebug ./utils/get_xdebug_ip /bin/
 COPY ./utils/setup_xdebug.php /tmp/setup_xdebug
 
 RUN echo ${XDEBUG_VERSION} &&\

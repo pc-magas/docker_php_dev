@@ -23,7 +23,6 @@ if [ "${XDEBUG_VERSION}" = "3" ]; then
   echo "SETUP XDEBUG 3"
 
   echo "[xdebug]" >> ${XDEBUG_CONF_FILE} 
-  echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.max_nesting_level = 1000" >> ${XDEBUG_CONF_FILE} 
   echo "xdebug.log = /var/log/xdebug/xdebug.log" >> ${XDEBUG_CONF_FILE} 
   echo "xdebug.discover_client_host=false" >> ${XDEBUG_CONF_FILE}
@@ -32,11 +31,16 @@ if [ "${XDEBUG_VERSION}" = "3" ]; then
   echo "xdebug.client_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.client_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
 
+  if [ "${XDEBUG_ENABLE}" == "true" ]; then
+   echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE}
+  else
+   echo "xdebug.mode = off" >> ${XDEBUG_CONF_FILE}
+  fi
+
 else 
   echo "SETUP XDEBUG 2"
 
   
-  echo "xdebug.remote_enable = 1" >>  ${XDEBUG_CONF_FILE}
   echo "xdebug.max_nesting_level = 1000" >>  ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_mode=req" >>  ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_autostart=true" >> ${XDEBUG_CONF_FILE}
@@ -44,16 +48,30 @@ else
 
   echo "xdebug.remote_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.remote_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
+
+  if [ "${XDEBUG_ENABLE}" == "true" ]; then
+   echo "xdebug.remote_enable = 1" >>  ${XDEBUG_CONF_FILE}
+  else
+   echo "xdebug.remote_enable = 0" >>  ${XDEBUG_CONF_FILE}
+  fi
 fi
 
+if [ ! -z "${XDEBUG_IDE_KEY}" ]; then
+  echo "xdebug.idekey=\"${XDEBUG_IDE_KEY}\"" >>${XDEBUG_CONF_FILE}
+
+  if [ "${XDEBUG_IDE_KEY}" == "PHPSTORM" ]; then
+    XDEBUG_DBGP=true
+  fi
+
+fi
+
+touch /var/log/xdebug/xdebug.log
+chown root:root /var/log/xdebug/xdebug.log
+chmod 666 /var/log/xdebug/xdebug.log
 
 # Common settings accros all version
 if [ XDEBUG_DBGP = TRUE ]; then
     echo "xdebug.remote.handler=dbgp" >>${XDEBUG_CONF_FILE}
-fi
-
-if [ ! -z "${XDEBUG_IDE_KEY}" ]; then
-    echo "xdebug.idekey=\"${XDEBUG_IDE_KEY}\"" >>${XDEBUG_CONF_FILE}
 fi
 
 echo "Fixing execution permissions"
@@ -77,8 +95,12 @@ echo 'case $- in
     *i*) ;;
       *) return;;
 esac
+echo "WELCOME TO DEV PHP DOCKER IMG shell session."
+echo "In order to run a php script with xdebug disabled use the php_no_xdebug command."
+
+#Aliases
+alias php_no_xdebug="php -d dxdebug.mode=off"
 ' >>  ${WWW_HOME}/.bashrc;
-echo 'echo "WELCOME TO DEV PHP DOCKER IMG"' >> ${WWW_HOME}/.bashrc;
 chown ${WEB_USER}:${WEB_USER} ${WWW_HOME}/.bashrc
 chmod 644 ${WWW_HOME}/.bashrc
 
