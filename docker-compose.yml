@@ -13,7 +13,6 @@ services:
     volumes:
       - "php_app:/var/www/html"
       - "./logs/xdebug:/var/log/xdebug"
-      - "./utils/get_xdebug_ip.php:/var/www/html/get_xdebug_ip.php"
       - "./ssl/ca/ca.crt:/usr/local/share/cert_install/ca.crt"
       - "./volumes/www-home:/home/www-data"
     networks:

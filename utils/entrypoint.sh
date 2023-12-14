@@ -71,6 +71,17 @@ if [ -d "${WWW_HOME}/.composer" ]; then
  chmod 777 ${WWW_HOME}/.composer
 fi
 
+echo "GENERATING .bashrc"
+echo "" > ${WWW_HOME}/.bashrc;
+echo 'case $- in
+    *i*) ;;
+      *) return;;
+esac
+' >>  ${WWW_HOME}/.bashrc;
+echo 'echo "WELCOME TO DEV PHP DOCKER IMG"' >> ${WWW_HOME}/.bashrc;
+chown ${WEB_USER}:${WEB_USER} ${WWW_HOME}/.bashrc
+chmod 644 ${WWW_HOME}/.bashrc
+
 echo "Installing certificates"
 
 if [ -f "/etc/ca-certificates.conf.orig" ]; then

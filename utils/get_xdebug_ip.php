@@ -23,12 +23,13 @@
 $matches = [];
 preg_match("/^\w*\s(00000000)\s(\w*)/m",file_get_contents("/proc/net/route"),$matches);
 
-// At regex each () is also matxched seperately. In my case I have 2 matched groups therefore the secodn match is my ip hex encoded
+// At regex each () is also matched seperately. In my case I have 2 matched groups therefore the secodn match is my ip hex encoded
 $ip = $matches[2];
 $ip = str_split($ip,2);
 $ip = array_reverse($ip);
 
 $ip = array_reduce($ip,function($acc,$item){
+    // I use intval instead of typecasting, in order to make it compartible with old PHP versions.
     return $acc.intval($item,16).".";
 },"");
 
