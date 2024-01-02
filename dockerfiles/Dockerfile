@@ -18,16 +18,27 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     XDEBUG_PORT=9003 \
     XDEBUG_DBGP=FALSE \
     XDEBUG_ENABLE=FALSE \
+    WWW_HOME="/home/www-data" \
     COMPOSER_MEMORY_LIMIT=-1
 
-RUN usermod --shell /bin/bash www-data &&\
-    curl -sSLf \
-        -o /usr/local/bin/install-php-extensions \
-        https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions &&\
-    chmod +x /usr/local/bin/install-php-extensions
+COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
+
+RUN \
+    chown root:root /usr/local/bin/entrypoint.sh &&\
+    chmod +x /usr/local/bin/entrypoint.sh &&\
+    mkdir ${WWW_HOME} &&\
+    chown www-data:www-data ${WWW_HOME} &&\
+    chmod -R 750 ${WWW_HOME} &&\
+    usermod --shell /bin/bash --home ${WWW_HOME} www-data &&\
+    cp /etc/ca-certificates.conf /etc/ca-certificates.conf.orig &&\
+    mkdir -p /usr/local/share/cert_install
+
+VOLUME /usr/local/share/cert_install
+VOLUME ${WWW_HOME}
 
 # INSTALL PHP MODULES HERE
-RUN install-php-extensions\
+RUN  --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
+     install-php-extensions\
      bcmath\
      ctype\
      curl\
@@ -55,29 +66,27 @@ RUN install-php-extensions\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
-
 # Install composer & git
 COPY --from=composer /usr/bin/composer /opt/composer
-RUN install-php-extensions zip &&\
+RUN --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
+    install-php-extensions zip &&\
     chown root:root /opt/composer &&\
-    echo "#!/usr/bin/env sh\nphp -dxdebug.mode=off /opt/composer" > /bin/composer &&\
+    echo -e '#!/usr/bin/env sh\nphp -dxdebug.mode=off /opt/composer "$@"' | sed 's/-e\s*//g' > /bin/composer &&\
     chmod +x /bin/composer &&\
     DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git &&\
-    mkdir -p /var/www/.composer &&\
-    chown www-data:www-data /var/www/.composer &&\
-    chmod 666 /var/www/.composer &&\
+    mkdir -p ${WWW_HOME}/.composer &&\
+    chown www-data:www-data ${WWW_HOME}/.composer &&\
     apt-get autoremove && apt-get autoclean &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
-VOLUME /var/www/.composer
+VOLUME ${WWW_HOME}/.composer
 
 # Install Xdebug
 ENV XDEBUG_CONF_FILE=${PHP_CONF_DIR}/docker-php-ext-xdebug.ini
 
 ARG XDEBUG_VERSION="latest"
 
-COPY ./utils/test_xdebug.php /bin/test_xdebug
-COPY ./utils/get_xdebug_ip.php /bin/get_xdebug_ip
+COPY ./utils/test_xdebug ./utils/get_xdebug_ip /bin/
 COPY ./utils/setup_xdebug.php /tmp/setup_xdebug
 
 RUN echo ${XDEBUG_VERSION} &&\
@@ -104,21 +113,7 @@ VOLUME /var/log/xdebug
 #     chown -R root:root /usr/local/lib/node_modules &&\
 #     mkdir -p /var/www/.npm
 
-#***********************************************#
-# Do not edit bellow this line
-#***********************************************#
 
-COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
-
-RUN chown root:root /usr/local/bin/entrypoint.sh &&\
-    chmod +x /usr/local/bin/entrypoint.sh &&\
-    usermod --shell /bin/bash www-data
-
-# COPY ./ssl/ca/ca.crt /usr/local/share/ca-certificates/php-www-ca.crt
-RUN cp /etc/ca-certificates.conf /etc/ca-certificates.conf.orig &&\
-    mkdir -p /usr/local/share/cert_install
-
-VOLUME /usr/local/share/cert_install
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]

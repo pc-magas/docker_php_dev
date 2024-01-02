@@ -7,6 +7,10 @@ A Basic php boilerplate code that allows you to rapidly setup and develop php ap
 
 # How to use
 
+## Step 0 (Optional)
+
+Create a branch for a new project.
+
 ## Step 1
 
 Copy the `.env.dist` into `.env`
