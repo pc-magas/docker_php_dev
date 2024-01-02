@@ -29,6 +29,12 @@ CA_PATH="${SSL_PATH}/ca"
 CA_KEY=${CA_PATH}/ca.key 
 CA_CERT=${CA_PATH}/ca.crt 
 
+if [[ -d ${CA_CERT} ]] || [[ -d ${CA_KEY} ]]; then
+     echo "CA Certs are directories not files"
+     rm -rf ${CA_KEY}
+     rm -rf ${CA_CERT}
+fi
+
 if  [[ ! -f ${CA_CERT} ]] || [[ ! -f ${CA_KEY} ]]; then
 
     openssl genrsa -out ${CA_KEY} 2048
@@ -46,8 +52,11 @@ SIGNING_REQUEST=${CERT_PATH}/${CERT_BASENAME}.csr
 
 echo "CREATING CERTIFICATE"
 
-openssl req -new -sha512 -keyout ${KEY_PATH} -nodes -out ${SIGNING_REQUEST} -config ${SSL_CONF_PATH}
+rm -rf ${CERTIFICATE_PATH}
+rm -rf ${KEY_PATH}
 
+
+openssl req -new -sha512 -keyout ${KEY_PATH} -nodes -out ${SIGNING_REQUEST} -config ${SSL_CONF_PATH}
 
 echo "SIGNING CERTIFICATE using CA"
 openssl x509 -req -days 9000 -startdate -sha512 -in ${SIGNING_REQUEST} \
