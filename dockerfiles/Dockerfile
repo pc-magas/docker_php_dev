@@ -37,34 +37,34 @@ VOLUME /usr/local/share/cert_install
 VOLUME ${WWW_HOME}
 
 # INSTALL PHP MODULES HERE
-RUN  --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
-     install-php-extensions\
-     bcmath\
-     ctype\
-     curl\
-     dom\ 
-     fileinfo\ 
-     filter\ 
-     gd\ 
-     hash\ 
-     iconv\ 
-     intl\ 
-     json\ 
-     libxml\ 
-     openssl\ 
-     mbstring\ 
-     pcre\
-     pdo pdo_mysql\
-     simplexml\
-     soap \
-     sockets\
-     sodium\
-     spl\
-     tokenizer\
-     xmlwriter\
-     xsl &&\
-    apt-get autoremove && apt-get autoclean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
+# RUN  --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
+#      install-php-extensions\
+#      bcmath\
+#      ctype\
+#      curl\
+#      dom\ 
+#      fileinfo\ 
+#      filter\ 
+#      gd\ 
+#      hash\ 
+#      iconv\ 
+#      intl\ 
+#      json\ 
+#      libxml\ 
+#      openssl\ 
+#      mbstring\ 
+#      pcre\
+#      pdo pdo_mysql\
+#      simplexml\
+#      soap \
+#      sockets\
+#      sodium\
+#      spl\
+#      tokenizer\
+#      xmlwriter\
+#      xsl &&\
+#     apt-get autoremove && apt-get autoclean &&\
+#     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
 # Install composer & git
 COPY --from=composer /usr/bin/composer /opt/composer
@@ -115,5 +115,5 @@ VOLUME /var/log/xdebug
 
 
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash","/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 WEB_USER="www-data"
 
@@ -31,7 +31,10 @@ if [ "${XDEBUG_VERSION}" = "3" ]; then
   echo "xdebug.client_host=${XDEBUG_HOST}" >> ${XDEBUG_CONF_FILE}
   echo "xdebug.client_port=${XDEBUG_PORT}" >> ${XDEBUG_CONF_FILE}
 
+  XDEBUG_ENABLE=$(echo "${XDEBUG_ENABLE}" | tr '[:upper:]' '[:lower:]')
+  echo $XDEBUG_ENABLE
   if [ "${XDEBUG_ENABLE}" == "true" ]; then
+    echo "HERE"
    echo "xdebug.mode = debug,develop" >> ${XDEBUG_CONF_FILE}
   else
    echo "xdebug.mode = off" >> ${XDEBUG_CONF_FILE}
@@ -57,7 +60,7 @@ else
 fi
 
 if [ ! -z "${XDEBUG_IDE_KEY}" ]; then
-  echo "xdebug.idekey=\"${XDEBUG_IDE_KEY}\"" >>${XDEBUG_CONF_FILE}
+  echo "xdebug.idekey=\"${XDEBUG_IDE_KEY}\"" >> ${XDEBUG_CONF_FILE}
 
   if [ "${XDEBUG_IDE_KEY}" == "PHPSTORM" ]; then
     XDEBUG_DBGP=true
