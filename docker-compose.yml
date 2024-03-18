@@ -15,6 +15,11 @@ services:
       - "./logs/xdebug:/var/log/xdebug"
       - "./ssl/ca/ca.crt:/usr/local/share/cert_install/ca.crt"
       - "./volumes/www-home:/home/www-data"
+      # Uncomment for ssh These files will be copied upon
+      # - "./conf/ssh/config:/home/www-data/.ssh_settings/config"
+      # Replace ssh keys here
+      # - "~/.ssh/pc_magas.pub:/home/www-data/.ssh_settings/pc_magas.pub"
+      # - "~/.ssh/pc_magas:/home/www-data/.ssh_settings/pc_magas"
     networks:
       private:
     env_file: env/php.env

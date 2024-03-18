@@ -52,9 +52,13 @@ docker-compose down -v
 
 ## PHP & Nginx
 
+### For PHP
 The volume `php_app` is mapped upon the folder via bind mount  at the path defined in `${PHP_APP_PATH}`.
-
 Also there is a volume mounted upon `logs/xdebug` where the xdebug log ist stored upon.
+
+### For  www-data Home user
+Upon PHP container an extra folder `/home/www-data` is created this is used for composer cache, npm cache and ssh settings.
+For ssh settings and keys. Moung you host path at `~/.ssh_config` folder. Its contents are copied upon `~/.ssh` via entrypoint script.
 
 ## Mariadb
 

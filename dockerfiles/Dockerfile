@@ -19,7 +19,8 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     XDEBUG_DBGP=FALSE \
     XDEBUG_ENABLE=FALSE \
     WWW_HOME="/home/www-data" \
-    COMPOSER_MEMORY_LIMIT=-1
+    COMPOSER_MEMORY_LIMIT=-1 \
+    DEBIAN_FRONTEND=noninteractive
 
 COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
 
@@ -31,12 +32,21 @@ RUN \
     chmod -R 750 ${WWW_HOME} &&\
     usermod --shell /bin/bash --home ${WWW_HOME} www-data &&\
     cp /etc/ca-certificates.conf /etc/ca-certificates.conf.orig &&\
-    mkdir -p /usr/local/share/cert_install
+    mkdir -p /usr/local/share/cert_install &&\
+    apt-get update &&\ 
+    apt-get install -y openssh-client &&\
+    mkdir -p ${WWW_HOME}/.ssh_settings &&\
+    mkdir -p ${WWW_HOME}/.ssh &&\
+    chown www-data:www-data ${WWW_HOME}/.ssh_settings &&\
+    chown www-data:www-data ${WWW_HOME}/.ssh &&\
+    apt-get autoremove && apt-get autoclean &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* cache/* /var/lib/log/*
 
 VOLUME /usr/local/share/cert_install
 VOLUME ${WWW_HOME}
 
 # INSTALL PHP MODULES HERE
+# Please use this commend and make your own.
 # RUN  --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
 #      install-php-extensions\
 #      bcmath\
@@ -113,7 +123,9 @@ VOLUME /var/log/xdebug
 #     chown -R root:root /usr/local/lib/node_modules &&\
 #     mkdir -p /var/www/.npm
 
-
+# ************************************************************************************#
+# Uncomment if you need to install private packages via composer and git-hosted repos #
+# ************************************************************************************#
 
 ENTRYPOINT ["/bin/bash","/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]

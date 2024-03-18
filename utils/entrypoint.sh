@@ -130,5 +130,17 @@ done
 
 update-ca-certificates
 
+echo "Configure SSH Client"
+if [ -d "${WWW_HOME}/.ssh_settings" ]; then
+  ls -l "${WWW_HOME}/.ssh_settings"
+  mkdir -p ${WWW_HOME}/.ssh
+  cp ${WWW_HOME}/.ssh_settings/*  ${WWW_HOME}/.ssh/
+fi
+
+if [ -d "${WWW_HOME}/.ssh" ]; then
+  chown -R ${WEB_USER}:${WEB_USER} ${WWW_HOME}/.ssh
+  chmod 600 ${WWW_HOME}/.ssh/*
+fi
+
 echo "Launch application"
 exec "$@"

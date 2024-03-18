@@ -1,0 +1,6 @@
+Host github.com
+ Hostname github.com
+ # Replace with your own key file
+ IdentityFile ~/.ssh/pc_magas
+ user git
+ IdentitiesOnly=yes
