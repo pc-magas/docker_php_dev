@@ -1,9 +1,12 @@
-version: "3.3"
+version: "3.8"
+name: ${APP_NAME}
+
 services:
 
   # PHP APPS
   php_app:
-    container_name: php_app
+    container_name: ${APP_NAME}
+    image: ${APP_NAME}/php
     build:
       context: .
       dockerfile: ./dockerfiles/Dockerfile
@@ -27,6 +30,7 @@ services:
   # Supportive services
   
   nginx:
+    container_name: ${APP_NAME}-nginx
     image: nginx
     networks:
       private:
@@ -41,6 +45,7 @@ services:
   mariadb:
     # Replace with your own
     image: mariadb:10.4
+    container_name: ${APP_NAME}-mariadb
     command:
       --max_allowed_packet=64M
       --optimizer_use_condition_selectivity=1
@@ -49,9 +54,10 @@ services:
       private:
       public:
         ipv4_address: ${IP_BASE}.3
-    env_file: env/db.env
+    env_file: env/mysql_maria.env
     volumes:
       - ./volumes/db:/var/lib/mysql
+      - ./provision/mariadb/create-test-db.sh:/docker-entrypoint-initdb.d/create-test-db.sh
 
 volumes:
 

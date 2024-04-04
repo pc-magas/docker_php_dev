@@ -30,6 +30,14 @@ For example if `IP_BASE` is `172.168.3` the used IPS are:
 Fpm used an intenral network whereas also nginx and mariadb also use it.
 More info on networking section
 
+#### PHP APPLICATION NAME (also used as project name)
+The `APP_NAME` environmental variable is also used for various usages:
+* As a container name prefix
+* As a project name
+* As a php image name prefix
+
+Is is important to set it up in order to have the containers unaffected from other `docker-compose.yml` files having the same service names.
+
 ## Step 3 Run
 
 Execute:
@@ -56,13 +64,24 @@ docker-compose down -v
 The volume `php_app` is mapped upon the folder via bind mount  at the path defined in `${PHP_APP_PATH}`.
 Also there is a volume mounted upon `logs/xdebug` where the xdebug log ist stored upon.
 
-### For  www-data Home user
+### For www-data Home user
 Upon PHP container an extra folder `/home/www-data` is created this is used for composer cache, npm cache and ssh settings.
 For ssh settings and keys. Moung you host path at `~/.ssh_config` folder. Its contents are copied upon `~/.ssh` via entrypoint script.
 
 ## Mariadb
 
+### For Database Data 
 The folder `./volumes/db` is mapped into `/var/lib/mysql` via bind mount therefore upon `docker-compose down -v` will NOT be deleted.
+
+### For settiung up a test database (usefull for unit and iontegration tests)
+Also a script located upon `./provision/db/maria/setup_test_db.sh` is used. That script is creates a seperate db for the user `$MYSQL_USRT` named as the one defined upon `$MYSQL_DATABASE` but with `test_` prefixed into it. This is used for dbs tat are used for testing.
+
+# Environments
+
+Beyond `.env` each service has its own env file as well. These are located upon `env` folder:
+
+* `env/php.env` Configures the environment for `php_app` service. This is the service that runs php_fpm.
+* `env/mysql_maria.env` Configures the environment for `mariadb` service. This is the service that runs mariadb
 
 # Networks
 
