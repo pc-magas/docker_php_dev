@@ -19,6 +19,7 @@
 
 SCRIPT="$(readlink --canonicalize-existing "$0")"
 SCRIPTPATH="$(dirname "$SCRIPT")"
+echo $SCRIPTPATH
 SSL_PATH="${SCRIPTPATH}/../ssl"
 
 CERT_PATH="${SSL_PATH}/certs"
@@ -36,12 +37,11 @@ if [[ -d ${CA_CERT} ]] || [[ -d ${CA_KEY} ]]; then
 fi
 
 if  [[ ! -f ${CA_CERT} ]] || [[ ! -f ${CA_KEY} ]]; then
-
-    openssl genrsa -out ${CA_KEY} 2048
+    echo "Making CA Certificates"
+    openssl genrsa -out "${CA_KEY}" 2048
     openssl req -x509 -new -nodes \
-            -key ${CA_KEY} -subj "/C=GR/L=ATTICA" \
-            -days 1825 -out ${CA_CERT}
-
+            -key "${CA_KEY}" -subj "/C=GR/L=ATTICA" \
+            -days 1825 -out "${CA_CERT}"
 fi
 
 CERT_BASENAME="www"
@@ -56,15 +56,18 @@ rm -rf ${CERTIFICATE_PATH}
 rm -rf ${KEY_PATH}
 
 
-openssl req -new -sha512 -keyout ${KEY_PATH} -nodes -out ${SIGNING_REQUEST} -config ${SSL_CONF_PATH}
+openssl req -new -sha512 -keyout "${KEY_PATH}" -nodes -out "${SIGNING_REQUEST}" -config "${SSL_CONF_PATH}"
 
 echo "SIGNING CERTIFICATE using CA"
-openssl x509 -req -days 9000 -startdate -sha512 -in ${SIGNING_REQUEST} \
-     -CAkey ${CA_KEY} -CA ${CA_CERT} -CAcreateserial \
-     -extfile ${SIGNING_REQUEST_CONF} \
-     -out ${CERTIFICATE_PATH} 
 
-rm -rf ${SIGNING_REQUEST}
+echo "SIGNING REQUEST: ${SIGNING_REQUEST}" 
+
+openssl x509 -req -days 9000 -startdate -sha512 -in "${SIGNING_REQUEST}" \
+     -CAkey "${CA_KEY}" -CA "${CA_CERT}" -CAcreateserial \
+     -extfile "${SIGNING_REQUEST_CONF}" \
+     -out "${CERTIFICATE_PATH}" 
+
+rm -rf "${SIGNING_REQUEST}"
 
 echo "#######################################"
 echo "IMPORT these cert into your system as CA cert:"
