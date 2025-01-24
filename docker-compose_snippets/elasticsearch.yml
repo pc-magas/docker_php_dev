@@ -1,0 +1,19 @@
+version: "3.8"
+name: ${APP_NAME}
+
+services:
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/DockerfileElastic
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+    networks:
+      default:
+        ipv4_address: ${IP_BASE}.9
+    volumes:
+      - ./volumes/es-data:/usr/share/elasticsearch/data
+      - ./conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml

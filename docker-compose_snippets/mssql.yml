@@ -1,0 +1,20 @@
+version: "3.8"
+name: ${APP_NAME}
+
+services:
+  mssql:
+    # Replace with your own
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    networks:
+      default:
+        ipv4_address: ${IP_BASE}.3
+    command: bash -c "chmod -R 777 /usr/src/sql/ && /opt/mssql/bin/sqlservr"
+    volumes:
+      - ./volumes/db/data:/var/opt/mssql/data
+      - ./volumes/db/log:/var/opt/mssql/log
+      - ./sql:/usr/src/sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "T3stpsswd"
+      MSSQL_PID: "Developer"

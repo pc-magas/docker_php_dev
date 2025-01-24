@@ -59,21 +59,21 @@ services:
       - ./volumes/db:/var/lib/mysql
       - ./provision/mariadb/create-test-db.sh:/docker-entrypoint-initdb.d/create-test-db.sh
 
-  elasticsearch:
-    build:
-      context: .
-      dockerfile: ./dockerfiles/DockerfileElastic
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-      - xpack.security.enabled=false
-      - xpack.security.http.ssl.enabled=false
-    networks:
-      default:
-        ipv4_address: ${IP_BASE}.9
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: always
     volumes:
-      - ./volumes/es-data:/usr/share/elasticsearch/data
-      - ./conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./volumes/mailpit:/data
+    networks:
+      private:
+      public:
+        ipv4_address: ${IP_BASE}.6
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 
 volumes:

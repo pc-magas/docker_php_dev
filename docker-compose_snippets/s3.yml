@@ -1,0 +1,13 @@
+version: "3.8"
+name: ${APP_NAME}
+
+services:
+  s3:
+    image: scireum/s3-ninja
+    user: "0:sirius"
+    volumes:
+      - "./volumes/s3/data:/home/sirius/data"
+      - "./volumes/s3/logs:/home/sirius/logs"
+    networks:
+      default:
+        ipv4_address: ${IP_BASE}.4
