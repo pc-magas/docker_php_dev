@@ -1,0 +1,8 @@
+ARG VERSION=8.10.0
+
+FROM docker.elastic.co/elasticsearch/elasticsearch:${VERSION}
+
+COPY --chown=root:root --chmod=0755 ./provision/elastic/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+USER root
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

@@ -1,0 +1,10 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+
+# CORS
+
+# http.cors.enabled: true
+# Adjust to IP
+# http.cors.allow-origin: 0.0.0.0
+
+# http.cors.allow-headers: X-Requested-With,Content-Type,Content-Length,Authorization

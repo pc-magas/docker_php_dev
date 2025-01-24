@@ -59,6 +59,24 @@ services:
       - ./volumes/db:/var/lib/mysql
       - ./provision/mariadb/create-test-db.sh:/docker-entrypoint-initdb.d/create-test-db.sh
 
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/DockerfileElastic
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+    networks:
+      private:
+      public:
+        ipv4_address: ${IP_BASE}.9
+    volumes:
+      - ./volumes/es-data:/usr/share/elasticsearch/data
+      - ./conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+
+
 volumes:
 
   php_app:
