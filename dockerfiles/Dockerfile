@@ -23,6 +23,7 @@ ENV PHP_CONF_DIR="$PHP_INI_DIR/conf.d" \
     DEBIAN_FRONTEND=noninteractive
 
 COPY ./utils/entrypoint.sh  /usr/local/bin/entrypoint.sh
+COPY --chown=root:root --chmod=0755 ./utils/check_connect  /usr/local/bin/check_connect
 
 RUN \
     chown root:root /usr/local/bin/entrypoint.sh &&\

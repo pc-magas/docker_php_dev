@@ -24,8 +24,10 @@ services:
       # - "~/.ssh/pc_magas.pub:/home/www-data/.ssh_settings/pc_magas.pub"
       # - "~/.ssh/pc_magas:/home/www-data/.ssh_settings/pc_magas"
     networks:
-      private:
+      default:
     env_file: env/php.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # Supportive services
   
@@ -33,8 +35,7 @@ services:
     container_name: ${APP_NAME}-nginx
     image: nginx
     networks:
-      private:
-      public:
+      default:
         ipv4_address: ${IP_BASE}.2
     volumes:
       - "php_app:/var/www/html"
@@ -51,8 +52,7 @@ services:
       --optimizer_use_condition_selectivity=1
       --optimizer_switch="rowid_filter=off"
     networks:
-      private:
-      public:
+      default:
         ipv4_address: ${IP_BASE}.3
     env_file: env/mysql_maria.env
     volumes:
@@ -69,8 +69,7 @@ services:
       - xpack.security.enabled=false
       - xpack.security.http.ssl.enabled=false
     networks:
-      private:
-      public:
+      default:
         ipv4_address: ${IP_BASE}.9
     volumes:
       - ./volumes/es-data:/usr/share/elasticsearch/data
@@ -87,9 +86,10 @@ volumes:
       device: ${PHP_APP_PATH}
   
 networks:
-  private:
-  public:
+
+  default:
     ipam:
       config:
         - subnet: ${IP_BASE}.0/24
-          gateway: ${IP_BASE}.1 
+          gateway: ${IP_BASE}.1
+          ip_range: ${IP_BASE}.128/25
