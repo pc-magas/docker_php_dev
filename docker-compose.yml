@@ -16,8 +16,10 @@ services:
     volumes:
       - "php_app:/var/www/html"
       - "./logs/xdebug:/var/log/xdebug"
-      - "./ssl/ca/ca.crt:/usr/local/share/cert_install/ca.crt"
       - "./volumes/www-home:/home/www-data"
+      - "./ssl/ca/ca.crt:/usr/local/share/cert_install/ca.crt"
+      - ./volumes/mitmproxy:/usr/local/share/cert_install/mitmproxy
+
       # Uncomment for ssh These files will be copied upon
       # - "./conf/ssh/config:/home/www-data/.ssh_settings/config"
       # Replace ssh keys here
@@ -66,8 +68,7 @@ services:
     volumes:
       - ./volumes/mailpit:/data
     networks:
-      private:
-      public:
+      default:
         ipv4_address: ${IP_BASE}.6
     environment:
       MP_MAX_MESSAGES: 5000
@@ -75,6 +76,16 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
+  mitmproxy:
+    image: mitmproxy/mitmproxy
+    command: mitmweb --listen-host 0.0.0.0 --web-host 0.0.0.0 --no-web-open-browser --set console_eventlog_verbosity=debug
+    stdin_open: true
+    tty: true  
+    networks:
+      default:
+        ipv4_address: ${IP_BASE}.7
+    volumes:
+      - ./volumes/mitmproxy:/home/mitmproxy/.mitmproxy
 
 volumes:
 

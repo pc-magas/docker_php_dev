@@ -113,19 +113,18 @@ if [ -f "/etc/ca-certificates.conf.orig" ]; then
   cp /etc/ca-certificates.conf.orig /etc/ca-certificates.conf
 fi
 
-for cert in /usr/local/share/cert_install/*; do
-  
+find /usr/local/share/cert_install/ -type f | while read -r cert; do
   echo "Checking $cert"
-  openssl x509 -in $cert -text -noout 2>&1 > /dev/null
-  if [ ! $? ]  ; then 
-    continue;
+  openssl x509 -in "$cert" -text -noout 2>&1 > /dev/null
+  if [ $? -ne 0 ]; then
+    continue
   fi
 
-  base_certname=$(basename $cert)
+  base_certname=$(basename "$cert")
   base_certname="${base_certname%%.*}.crt"
 
-  cp $cert /usr/share/ca-certificates/$base_certname
-  echo $base_certname >> /etc/ca-certificates.conf
+  cp "$cert" "/usr/share/ca-certificates/$base_certname"
+  echo "$base_certname" >> /etc/ca-certificates.conf
 done
 
 update-ca-certificates
